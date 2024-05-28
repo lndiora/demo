@@ -151,4 +151,42 @@ nano /etc/ssh/sshd_config
 AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 (вводите ip и пользователя всех устройств кроме CLI)
 systemctl restart ssh
 
+	-----Модуль 2 задание 1-----
+	Настройте DNS-сервер на сервере HQ-SRV: a. На DNS сервере необходимо настроить 2 зоны
+	Зона hq.work, также не забудьте настроить обратную зону.
+
+	Имя		 Тип записи	Адрес
+	hq-r.hq.work		A, PTR	IP-адрес - зона hq.work
+	hq-srv.hq.work	        A, PTR	IP-адрес - зона hq.work
+			
+	br-r.branch.work	A, PTR	IP-адрес - зона branch.work
+	br-srv.branch.work	A	IP-адрес - зона branch.work
+
+
+не смог
+
+	-----Модуль 2 задание 2-----
+	Настройте синхронизацию времени между сетевыми устройствами по протоколу NTP.
+  	a. В качестве сервера должен выступать роутер HQ-R со стратумом 5
+  	b. Используйте Loopback интерфейс на HQ-R, как источник сервера времени
+  	c. Все остальные устройства и сервера должны синхронизировать свое время с роутером HQ-R
+  	d. Все устройства и сервера настроены на московский часовой пояс (UTC +3)
+	
+timedatectl set-timezone Europe/Moscow (на всех машинах)
+apt install chrony -y (на всех машинах)
+systemctl enable chrony (на всех машинах)
+--HQ-R--
+nano /etc/chrony/chrony.conf
+всё убираем.
+server 127.0.0.1 iburst prefer
+local stratum 5
+allow all
+сохраняем, выходим. перезагружаем.
+systemctl restart chrony
+--ОСТАЛЬНЫЕ УСТРОЙСТВА--
+nano /etc/chrony/chrony.conf
+server 192.168.1.1 iburst prefer (указываем IP порта HQ-R который смотрит на вас)
+выходим, сохраняем.
+перезагружаем службу на всех устройствах.
+пишем на HQ-R: chronyc clients - проверяем
 	
