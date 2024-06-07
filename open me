@@ -151,7 +151,7 @@ nano /etc/ssh/sshd_config
 AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 (вводите ip и пользователя всех устройств кроме CLI)
 systemctl restart ssh
 
-	-----Модуль 2 задание 1-----
+	-----Модуль 2 задание 1----- (https://github.com/abdurrah1m/DEMO2024 - можете по его примеру делать, ток свои папки и значения)
 	Настройте DNS-сервер на сервере HQ-SRV: a. На DNS сервере необходимо настроить 2 зоны
 	Зона hq.work, также не забудьте настроить обратную зону.
 
@@ -162,16 +162,90 @@ systemctl restart ssh
 	br-r.branch.work	A, PTR	IP-адрес - зона branch.work
 	br-srv.branch.work	A	IP-адрес - зона branch.work
 
+--HQ-SRV--
+apt update -y
+apt install bind9 -y
+systemctl enable --now bind9
+nano /etc/bind/named.conf.options
+//forwarders {
+//	8.8.8.8;
+// }l; - короче просто вместо 0.0.0.0 напиши 8.8.8.8 в графе выше
 
-не смог
+nano /etc/resolv.conf
+search hq.work
+search branch.work
+nameserver 127.0.0.1
 
-	-----Модуль 2 задание 2-----
+nano /etc/bind/named.conf.local
+пишем строки:
+zone "hq.work" {
+	type master;
+	file "/etc/bind/hq.db";
+};
+
+zone "branch.work" {
+	type master;
+	file "/etc/bind/branch.db";
+};
+
+zone "1.168.192.in-addr.arpa" {
+	type master;
+	file "/etc/bind/0.db";    - то что 1.168.192 это ваш ип только наоборот без последнего актета.
+};
+сохраняем, выходим.
+в папке /etc/bind/ - у вас будут дефолтные файлы зон, создайте 3 копии. 
+например : cp /etc/bind/db.127 /etc/bind/hq.db
+	   cp /etc/bind/db.127 /etc/bind/branch.db
+	   cp /etc/bind/db.127 /etc/bind/0.db
+
+заходим в /etc/bind/hq.db
+сверху будет localhost.   root.localhost. 
+меняем на:
+hq.work. root.hq.work
+в самом низу пишем:
+	IN	NS	hq.work.
+	IN	A	192.168.1.5 #ip HQ-SRV
+hq-srv  IN	A	192.168.1.5 #ip HQ-SRV
+hq-r	IN	A	192.168.1.1 #ip hq-r
+сохраняем выходим
+
+Повторяем все тоже самое только вводим данные других зон
+nano /etc/bind/branch.db
+сверху будет localhost.   root.localhost. 
+меняем на:
+branch.work. root.branch.work.
+в самом низу пишем:
+	IN	NS	branch.work.
+	IN	A	192.168.1.5 #ip HQ-SRV
+br-srv  IN	A	192.168.2.2 #ip br-srv
+br-r	IN	A	192.168.2.1 #ip brr
+
+nano /etc/bind/0.db
+сверху будет localhost.   root.localhost. 
+меняем на:
+work.	root.work.
+в самом низу пишем 
+@	IN	NS	hq.work.
+5	IN	PTR	hq-srv.hq.work.
+1	IN	PTR	hq-r.hq.work.
+1	IN	PTR	br-r.branch.work.
+2	IN	PTR	br-srv.branch.work.
+(цифры 5 1 1 2. - это последний актет ip-адреса устройств.)
+systemctl restart bind9
+systemctl status bind9 
+если ошибок нет, то все ок. если есть dnsutils, то можем проверить:
+nslookup hq-r.hq.work (у hqr перезагрузи networking)
+если не работает - все перепроверяй. не помогло - https://github.com/abdurrah1m/DEMO2024
+
+
+	-----Модуль 2 задание 2----- 
 	Настройте синхронизацию времени между сетевыми устройствами по протоколу NTP.
   	a. В качестве сервера должен выступать роутер HQ-R со стратумом 5
   	b. Используйте Loopback интерфейс на HQ-R, как источник сервера времени
   	c. Все остальные устройства и сервера должны синхронизировать свое время с роутером HQ-R
   	d. Все устройства и сервера настроены на московский часовой пояс (UTC +3)
-	
+
+
 timedatectl set-timezone Europe/Moscow (на всех машинах)
 apt install chrony -y (на всех машинах)
 systemctl enable chrony (на всех машинах)
