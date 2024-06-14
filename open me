@@ -108,6 +108,7 @@ nano /etc/passwd - у каждого созданного пользовател
 Network_Admin:x:1001:1001::/home/Network_Admin:/bin/sh
 Network_Admin:x:1001:1001::/home/Network_Admin:/bin/bash
 проверяем работоспособность - su - Network_Admin (зашло - молодцы)
+
 	5. Измерьте пропускную способность сети между двумя 
 	узлами HQ-R-ISP по средствам утилиты iperf 3. 
 	Предоставьте описание пропускной способности канала со скриншотами.
@@ -130,6 +131,17 @@ mkdir /etc/networkbackup (путь можешь свой сделать)
 crontab -e
 30 15 * * * cp /etc/frr/frr.conf /etc/networkbackup (перевод звездочек - минута | час | день | месяц | день недели |)
 (по примеру выше скрипт сохранения будет срабатывать каждый день в 15:30. выбирайте свое время.)
+/////////////////// 2 вариант ///////////////////////////////////
+mkdir /etc/networkbackup
+nano /etc/networkbackup/script.sh
+пишите в скрипте:
+cp /etc/frr/frr.conf /etc/networkbackup
+закрываем
+cd /etc/networkbackup/
+chmod 777 script.sh
+crontab -e
+* * * * * /etc/networkbackup/script.sh
+
 
 	7. Настройте подключение по SSH для удалённого 
 	конфигурирования устройства HQ-SRV по порту 2222. 
