@@ -103,7 +103,11 @@ useradd Admin
 passwd Admin (и так с остальными)
 usermod -aG sudo Admin (если пользователя нужно добавить в sudo)
 nano /etc/passwd (для проверки создания пользователя)
-
+nano /etc/passwd - у каждого созданного пользователя в конце меняем sh на bash. 
+пример:
+Network_Admin:x:1001:1001::/home/Network_Admin:/bin/sh
+Network_Admin:x:1001:1001::/home/Network_Admin:/bin/bash
+проверяем работоспособность - su - Network_Admin (зашло - молодцы)
 	5. Измерьте пропускную способность сети между двумя 
 	узлами HQ-R-ISP по средствам утилиты iperf 3. 
 	Предоставьте описание пропускной способности канала со скриншотами.
