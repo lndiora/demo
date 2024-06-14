@@ -166,6 +166,12 @@ ssh student@192.168.1.2 -p 2222 (пробуем подключаться)
 nano /etc/ssh/sshd_config
 AllowUsers student@192.168.0.1 student@192.168.0.140 student@192.168.0.129 (вводите ip и пользователя всех устройств кроме CLI)
 systemctl restart ssh
+если вы всё еще можете законнектится на CLI, то:
+---CLI---
+nano /etc/network/interfaces
+post-up iptables -I OUTPUT -p tcp --dport 2222 -j DROP
+systemctl restart networking
+порт заблочен, 100% не зайдете.
 
 	-----Модуль 2 задание 1----- (https://github.com/abdurrah1m/DEMO2024 - можете по его примеру делать, ток свои папки и значения)
 	Настройте DNS-сервер на сервере HQ-SRV: a. На DNS сервере необходимо настроить 2 зоны
