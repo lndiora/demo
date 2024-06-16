@@ -300,3 +300,31 @@ server 192.168.1.1 iburst prefer (указываем IP порта HQ-R кото
 
 --HQ-SRV--
 apt install samba
+systemctl enable --now smbd
+
+	-----Модуль 2 задание 5-----
+	5. Сконфигурируйте веб-сервер LMS Apache на сервере BRSRV:
+	a. На главной странице должен отражаться номер 
+	места
+	b. Используйте базу данных mySQL
+	c. Создайте пользователей в соответствии с таблицей, 
+	пароли у всех пользователей «P@ssw0rd»
+
+---BR-SRV--
+apt install apache2
+systemctl enable --now apache2
+nano /var/www/index.html
+удаляется там всё, и пишите номер своего места.
+systemctl restart apache2
+открываем браузер, пишем 127.0.0.1 - должно работать
+apt install mariadb-server -y
+systemctl enable --now mariadb
+(это на 1 балл если что)
+
+	-----Модуль 2 задание 5-----
+	 Запустите сервис MediaWiki используя docker на сервере 
+	HQ-SRV
+---HQ-SRV---
+apt install docker-compose 
+systemctl enable --now docker
+(1 балл мб дадут)
